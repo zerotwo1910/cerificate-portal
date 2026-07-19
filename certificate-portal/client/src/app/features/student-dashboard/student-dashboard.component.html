@@ -1,0 +1,51 @@
+<div class="page">
+  <header class="page-header">
+    <div class="brand">
+      <img src="images/wu-crest.png" alt="Waterloo University" class="brand-mark">
+      <div>
+        <h1>My Certificate</h1>
+        <p>Signed in as {{ currentUserName }}</p>
+      </div>
+    </div>
+    <button type="button" class="logout-btn" (click)="logout()">Log out</button>
+  </header>
+
+  @if (errorMessage) {
+    <div class="banner error">{{ errorMessage }}</div>
+  }
+
+  @if (isLoading) {
+    <section class="panel">
+      <p class="hint-text">Loading your record…</p>
+    </section>
+  } @else if (student) {
+    <section class="panel">
+      <div class="detail-grid">
+        <div class="detail">
+          <span class="detail-label">Name</span>
+          <span class="detail-value">{{ student.name }}</span>
+        </div>
+        <div class="detail">
+          <span class="detail-label">Register Number</span>
+          <span class="detail-value">{{ student.registerNumber }}</span>
+        </div>
+        <div class="detail">
+          <span class="detail-label">Course</span>
+          <span class="detail-value">{{ student.course }}</span>
+        </div>
+        <div class="detail">
+          <span class="detail-label">Certificate ID</span>
+          <span class="detail-value mono">{{ student.certificateId }}</span>
+        </div>
+        <div class="detail">
+          <span class="detail-label">Issue Date</span>
+          <span class="detail-value">{{ student.issueDate | date: 'longDate' }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="primary-btn download-btn" [disabled]="isDownloading" (click)="download()">
+        {{ isDownloading ? 'Preparing PDF…' : 'Download My Certificate' }}
+      </button>
+    </section>
+  }
+</div>

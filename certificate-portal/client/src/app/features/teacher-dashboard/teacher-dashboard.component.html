@@ -1,0 +1,168 @@
+<div class="page">
+  <header class="page-header">
+    <div class="brand">
+      <img src="images/wu-crest.png" alt="Waterloo University" class="brand-mark">
+      <div>
+        <h1>Teacher Dashboard</h1>
+        <p>Signed in as {{ currentUserName }}</p>
+      </div>
+    </div>
+    <button type="button" class="logout-btn" (click)="logout()">Log out</button>
+  </header>
+
+  <div class="bento-row">
+    <div class="bento-card">
+      <span class="bento-icon">🎓</span>
+      <div class="bento-body">
+        <span class="bento-value">{{ students.length }}</span>
+        <span class="bento-label">Total Students</span>
+      </div>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">✓</span>
+      <div class="bento-body">
+        <span class="bento-value">{{ verifiedStudentsCount }}</span>
+        <span class="bento-label">Verified Students</span>
+      </div>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">{{ canBulkDownload ? '📦' : '🔒' }}</span>
+      <div class="bento-body">
+        <span class="bento-value">{{ canBulkDownload ? 'Allowed' : 'Locked' }}</span>
+        <span class="bento-label">Bulk Download Access</span>
+      </div>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <div class="banner error">{{ errorMessage }}</div>
+  }
+  @if (successMessage) {
+    <div class="banner success">{{ successMessage }}</div>
+  }
+
+  <section class="panel">
+    <div class="panel-header">
+      <h2>Bulk Certificate Download</h2>
+    </div>
+
+    @if (!canBulkDownload) {
+      <p class="hint-text">
+        Bulk download isn't enabled for your account yet. Ask an administrator to turn it on.
+      </p>
+    } @else {
+      <div class="bulk-row">
+        <input type="file" accept=".csv,.xlsx,.xls" (change)="onFileSelected($event)" />
+        <button type="button" class="primary-btn" [disabled]="isBulkDownloading" (click)="bulkDownload()">
+          {{ isBulkDownloading ? 'Preparing zip…' : 'Download Bulk Certificates' }}
+        </button>
+      </div>
+      <p class="hint-text">
+        Upload a CSV or Excel file with a column named "registerNumber" or "email" — one row per student.
+      </p>
+    }
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <h2>All Students ({{ filteredStudents.length }})</h2>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search by name, register no., or email"
+        [(ngModel)]="searchTerm"
+        name="search"
+      />
+    </div>
+
+    @if (showEditForm) {
+      <form class="inline-form" [formGroup]="editForm" (ngSubmit)="submitEditForm()" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label>Name</label>
+            <input type="text" formControlName="name" maxlength="19" />
+            @if (editFieldError('name')) {
+              <span class="error">{{ editFieldError('name') }}</span>
+            }
+          </div>
+          <div class="field">
+            <label>Register Number</label>
+            <input type="text" formControlName="registerNumber" />
+            @if (editFieldError('registerNumber')) {
+              <span class="error">{{ editFieldError('registerNumber') }}</span>
+            }
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" formControlName="email" />
+            @if (editFieldError('email')) {
+              <span class="error">{{ editFieldError('email') }}</span>
+            }
+          </div>
+          <div class="field">
+            <label>Course</label>
+            <select formControlName="course">
+              <option value="" disabled>Select a course</option>
+              @for (option of courseOptions; track option) {
+                <option [value]="option">{{ option }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="secondary-btn" (click)="cancelEditForm()">Cancel</button>
+          <button type="submit" class="primary-btn" [disabled]="isSavingEdit">
+            {{ isSavingEdit ? 'Saving…' : 'Save Changes' }}
+          </button>
+        </div>
+      </form>
+    }
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Register No.</th>
+            <th>Email</th>
+            <th>Course</th>
+            <th>Verified</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (student of filteredStudents; track student.id) {
+            <tr>
+              <td>{{ student.name }}</td>
+              <td>{{ student.registerNumber }}</td>
+              <td>{{ student.email }}</td>
+              <td>{{ student.course }}</td>
+              <td>
+                <span class="pill" [class.verified]="student.isVerified">
+                  {{ student.isVerified ? 'Verified' : 'Pending' }}
+                </span>
+              </td>
+              <td>
+                <div class="actions">
+                  <button type="button" class="icon-link" (click)="openEditForm(student)">Edit</button>
+                  <button
+                    type="button"
+                    class="icon-link"
+                    [disabled]="!student.isVerified || isDownloadingId === student.id"
+                    (click)="downloadSingle(student)"
+                  >
+                    {{ isDownloadingId === student.id ? 'Downloading…' : 'Download PDF' }}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-row">No matching students.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
