@@ -1,0 +1,93 @@
+<div class="login-page">
+  <div class="login-card">
+    <img src="images/wu-crest.png" alt="Waterloo University" class="crest-badge">
+
+    <h1>Waterloo University</h1>
+    <p class="tagline">Certificate Portal</p>
+
+    <div class="role-tabs">
+      <button
+        type="button"
+        class="role-tab"
+        [class.active]="selectedRole === 'admin'"
+        (click)="selectRole('admin')"
+      >
+        Admin Login
+      </button>
+      <button
+        type="button"
+        class="role-tab"
+        [class.active]="selectedRole === 'teacher'"
+        (click)="selectRole('teacher')"
+      >
+        Teacher Login
+      </button>
+      <button
+        type="button"
+        class="role-tab"
+        [class.active]="selectedRole === 'student'"
+        (click)="selectRole('student')"
+      >
+        Student Login
+      </button>
+    </div>
+
+    @if (infoMessage) {
+      <div class="info-banner">{{ infoMessage }}</div>
+    }
+    @if (errorMessage) {
+      <div class="error-banner">{{ errorMessage }}</div>
+    }
+
+    <!-- Admin form -->
+    @if (selectedRole === 'admin') {
+      <form [formGroup]="adminForm" (ngSubmit)="submit()" novalidate>
+        <div class="field">
+          <label for="admin-username">Username</label>
+          <input id="admin-username" type="text" formControlName="username" placeholder="admin" />
+        </div>
+        <div class="field">
+          <label for="admin-password">Password</label>
+          <input id="admin-password" type="password" formControlName="password" placeholder="••••••••" />
+        </div>
+        <button type="submit" class="submit-btn" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Signing in…' : 'Sign in as Admin' }}
+        </button>
+      </form>
+    }
+
+    <!-- Teacher form -->
+    @if (selectedRole === 'teacher') {
+      <form [formGroup]="teacherForm" (ngSubmit)="submit()" novalidate>
+        <div class="field">
+          <label for="teacher-email">Email</label>
+          <input id="teacher-email" type="email" formControlName="email" placeholder="you@college.edu" />
+        </div>
+        <div class="field">
+          <label for="teacher-password">Password</label>
+          <input id="teacher-password" type="password" formControlName="password" placeholder="••••••••" />
+        </div>
+        <button type="submit" class="submit-btn" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Signing in…' : 'Sign in as Teacher' }}
+        </button>
+      </form>
+    }
+
+    <!-- Student form -->
+    @if (selectedRole === 'student') {
+      <form [formGroup]="studentForm" (ngSubmit)="submit()" novalidate>
+        <div class="field">
+          <label for="student-regno">Register Number</label>
+          <input id="student-regno" type="text" formControlName="registerNumber" placeholder="e.g. 21CS001" />
+        </div>
+        <div class="field">
+          <label for="student-email">Email</label>
+          <input id="student-email" type="email" formControlName="email" placeholder="you@student.edu" />
+        </div>
+        <button type="submit" class="submit-btn" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Checking…' : 'View My Certificate' }}
+        </button>
+      </form>
+    }
+  </div>
+</div>
