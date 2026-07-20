@@ -1,5 +1,0 @@
-@use '../../shared/dashboard' as dash;
-
-:host {
-  @include dash.dashboard-shell;
-}
